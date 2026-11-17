@@ -29,4 +29,4 @@ for i in range(12):
 
 density = total_people / total_area
 
-print("Средняя плотность:", round(density, 2), "чел/км2")
+print("Средняя плотность:", round(density, 2), "чел/км2")1
