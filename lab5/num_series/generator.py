@@ -113,3 +113,30 @@ def trend_series(
         for i in range(n)
 
     ]
+
+def exponential_series(
+        
+    n: int,
+
+    lambd: float = 0.5,
+
+    seed: Optional[int] = None
+) -> List[float]:
+    """Генерация экспоненциального ряда для варианта 13."""
+
+    _validate_n(n)
+
+    if not math.isfinite(lambd) or lambd <= 0:
+
+        raise ValueError(
+            "lambda должно быть положительным конечным числом"
+        )
+
+    rng = random.Random(seed)
+
+    return [
+
+        rng.expovariate(lambd)
+        
+        for _ in range(n)
+    ]

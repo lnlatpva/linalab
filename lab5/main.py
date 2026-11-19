@@ -13,25 +13,18 @@ import sys
 from typing import List, Optional, Tuple
 
 from num_series import (
-
+    benchmark_moving_average,
     random_series,
-
     sine_series,
-
     trend_series,
-
     summarize,
-
     simple_moving_average,
-
     centered_moving_average,
-
     exponential_moving_average,
-
+    exponential_series,
+    benchmark_moving_average,
     save_series_json,
-
     load_series_auto,
-
 )
 
 def build_series(kind: str, n: int, seed: int) -> List[float]:
@@ -72,6 +65,13 @@ def build_series(kind: str, n: int, seed: int) -> List[float]:
 
             seed=seed
 
+        )
+
+    if kind == "exponential":
+        return exponential_series(
+            n,
+            lambd=0.5,
+            seed=seed
         )
 
     raise ValueError(f"Неизвестный тип ряда: {kind!r}")
@@ -184,15 +184,15 @@ def build_parser() -> argparse.ArgumentParser:
 
     parser.add_argument(
 
-        "--kind",
+    "--kind",
 
-        choices=["random", "sine", "trend"],
+    choices=["random", "sine", "trend", "exponential"],
 
-        default="sine",
+    default="sine",
 
-        help="тип генерируемого ряда"
+    help="тип генерируемого ряда"
 
-    )
+)
 
     parser.add_argument(
 
@@ -282,6 +282,14 @@ def build_parser() -> argparse.ArgumentParser:
 
         help="вывести результаты в формате JSON"
 
+    )
+    parser.add_argument(
+        
+        "--benchmark",
+
+        action="store_true",
+
+        help="замерить время выполнения SMA для list и deque"
     )
 
     return parser
@@ -415,6 +423,25 @@ def main(argv: Optional[List[str]] = None) -> int:
             cma
 
         )
+
+    # Замер производительности SMA
+    
+    if args.benchmark:
+        print("-" * 60)
+        print("Замер времени выполнения SMA (среднее за 1000 повторов):")
+
+        timings = benchmark_moving_average(
+            data,
+            args.window,
+            repeats=1000
+        )
+
+        print(f" list  : {timings['list']:.8f} с")
+        print(f" deque : {timings['deque']:.8f} с")
+
+        if timings["deque"] > 0:
+            ratio = timings["list"] / timings["deque"]
+            print(f" отношение (list/deque): {ratio:.2f}")
 
     print_footer()
 
